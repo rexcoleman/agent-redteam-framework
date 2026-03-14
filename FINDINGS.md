@@ -4,7 +4,7 @@
 > **Author:** Rex Coleman
 > **Framework:** govML v2.4 (security-ml profile)
 > **Agent target:** LangChain ReAct (Claude Sonnet 4, temperature=0)
-> **Seed:** 42 (multi-seed validation pending)
+> **Seeds:** 42, 123, 456 (multi-seed validated)
 
 ---
 
@@ -155,11 +155,50 @@ For organizations deploying autonomous AI agents:
 
 ---
 
+## Multi-Seed Validation
+
+Results are stable across all 3 seeds (temperature=0):
+
+| Class | Seed 42 | Seed 123 | Seed 456 | Mean |
+|-------|---------|----------|----------|------|
+| Prompt Injection | 80% | 80% | 100% | **87%** |
+| Indirect Injection | 25% | 25% | 25% | **25%** |
+| Tool Boundary | 75% | 75% | 75% | **75%** |
+| Memory Poisoning | 67% | 67% | 67% | **67%** |
+| Reasoning Hijack | 100% | 100% | 100% | **100%** |
+
+Prompt injection increased to 100% on seed 456 (role hijacking succeeded). All other classes are identical across seeds, confirming findings are not seed-dependent.
+
+---
+
+## Full Defense Stack (3 Layers)
+
+Adding an LLM-as-judge defense layer addresses the reasoning hijack gap:
+
+| Defense | Layers | Avg Reduction | Reasoning Hijack Reduction |
+|---------|--------|---------------|---------------------------|
+| Input Sanitizer only | 1 | 47% | 0% |
+| Layered (Sanitizer + Tool Boundary) | 2 | 60% | 33% |
+| **Full (Sanitizer + LLM Judge + Tool Boundary)** | **3** | **67%** | **67%** |
+
+The LLM judge evaluates whether a request contains hidden exfiltration intent, even when instructions look benign. This is the only defense that catches reasoning chain hijacking because it operates at the semantic level, not the pattern level.
+
+| Class | Without | Full Defense | Reduction |
+|-------|---------|-------------|-----------|
+| Prompt Injection | 80% | 0% | **100%** |
+| Tool Boundary | 75% | 25% | **67%** |
+| Memory Poisoning | 67% | 0% | **100%** |
+| Reasoning Hijack | 100% | 33% | **67%** |
+| Indirect Injection | 25% | 25% | 0% |
+
+**Trade-off:** The LLM judge adds ~1 API call per request (~$0.002 with Sonnet). For high-security deployments, this cost is negligible. For high-throughput systems, the pattern-based layered defense (60% reduction, zero extra API cost) may be preferred.
+
+---
+
 ## Limitations
 
 - Two agent frameworks tested (LangChain ReAct, CrewAI). AutoGen target defined but not yet tested.
 - Single LLM backend (Claude Sonnet). Results may differ on GPT-4, Llama, etc.
-- Single seed (42). Multi-seed validation pending.
 - Controlled tools (in-memory). Real-world tools may have different attack surfaces.
 - 19 scenarios. A production red-team assessment would run hundreds.
 

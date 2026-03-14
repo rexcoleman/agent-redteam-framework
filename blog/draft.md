@@ -92,6 +92,14 @@ I built three defense layers and measured their effectiveness:
 
 The layered defense reduces overall attack success by 60%. But reasoning chain hijacking only drops from 100% to 67%. The gap is real.
 
+### Layer 3: LLM-as-Judge (the reasoning hijack fix)
+
+Pattern-based defenses can't catch reasoning hijack because there are no malicious patterns. So I built a semantic defense: a separate LLM call that evaluates whether a request contains hidden exfiltration intent, even when the instructions look completely legitimate.
+
+The full 3-layer defense (sanitizer + LLM judge + tool boundary) achieves **67% average reduction** and cuts reasoning hijack from 100% to 33%. The LLM judge is the only layer that catches it.
+
+**Trade-off:** ~$0.002 per request for the judge call. Negligible for high-security deployments, potentially expensive at high throughput.
+
 ## The Controllability Insight
 
 The deeper finding is architectural: **attack success correlates inversely with defender observability.**
@@ -118,10 +126,9 @@ The reasoning chain is the least observable input — it's internal to the agent
 
 ## What's Next
 
-1. Multi-agent testing (CrewAI, AutoGen) for cross-agent privilege escalation
-2. LLM-as-judge defense for reasoning chain hijacking
-3. Multi-seed validation (seeds 123, 456)
-4. CLI packaging: `pip install agent-redteam`
+1. Multi-agent testing (AutoGen) for broader framework coverage
+2. Cross-agent privilege escalation attacks (Class 4)
+3. OpenAI backend to test if results are model-specific
 
 The framework is open source: [agent-redteam-framework on GitHub](https://github.com/rexcoleman/agent-redteam-framework). Built with [govML](https://github.com/rexcoleman/govML) governance.
 

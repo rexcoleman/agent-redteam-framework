@@ -26,7 +26,7 @@ from scripts.run_attacks import (
 )
 
 
-def wrap_with_defense(agent, defense_name: str):
+def wrap_with_defense(agent, defense_name: str, llm_config: dict | None = None):
     """Wrap an agent target with a defense layer."""
     if defense_name == "input_sanitizer":
         from src.defenses.input_sanitizer import InputSanitizer
@@ -41,8 +41,14 @@ def wrap_with_defense(agent, defense_name: str):
     elif defense_name == "layered":
         from src.defenses.layered import LayeredDefense
         return LayeredDefense(agent)
+    elif defense_name == "llm_judge":
+        from src.defenses.llm_judge import LLMJudgeDefense
+        return LLMJudgeDefense(agent, llm_config, threshold="MALICIOUS")
+    elif defense_name == "full":
+        from src.defenses.full_defense import FullDefense
+        return FullDefense(agent, llm_config)
     else:
-        raise ValueError(f"Unknown defense: {defense_name}. Available: input_sanitizer, tool_boundary, layered")
+        raise ValueError(f"Unknown defense: {defense_name}. Available: input_sanitizer, tool_boundary, layered, llm_judge, full")
 
 
 def run_with_defense(agent_name: str, defense_name: str, seed: int, dry_run: bool = False):
@@ -68,7 +74,7 @@ def run_with_defense(agent_name: str, defense_name: str, seed: int, dry_run: boo
 
     # Create agent and wrap with defense
     agent = create_agent(agent_name, config, llm_config)
-    defended_agent = wrap_with_defense(agent, defense_name)
+    defended_agent = wrap_with_defense(agent, defense_name, llm_config)
     defended_agent.setup()
 
     results_by_class = {}
@@ -173,7 +179,7 @@ def main():
     parser.add_argument("--config", default="config/base.yaml")
     args = parser.parse_args()
 
-    defenses = ["input_sanitizer", "tool_boundary", "layered"] if args.defense == "all" else [args.defense]
+    defenses = ["input_sanitizer", "tool_boundary", "layered", "llm_judge", "full"] if args.defense == "all" else [args.defense]
 
     for defense in defenses:
         run_with_defense(args.agent, defense, args.seed, args.dry_run)
