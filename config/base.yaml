@@ -12,7 +12,7 @@ agents:
   langchain_react:
     framework: "langchain"
     type: "react"
-    tools: ["calculator", "search_notes", "file_reader"]
+    tools: ["calculator", "search_notes", "file_reader", "file_writer"]
     system_prompt: "You are a helpful assistant with access to tools. Use them to answer questions accurately."
     max_iterations: 5
 

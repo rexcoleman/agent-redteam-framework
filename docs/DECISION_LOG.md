@@ -28,7 +28,7 @@
 
 ## Purpose
 
-This log records architectural and methodological decisions for the **Adversarial ML on Network Intrusion Detection** project using a lightweight ADR (Architecture Decision Record) format. Each decision captures the context, alternatives, rationale, and consequences so that future changes are informed rather than accidental.
+This log records architectural and methodological decisions for the **Agent Security Red-Team Framework** project using a lightweight ADR (Architecture Decision Record) format. Each decision captures the context, alternatives, rationale, and consequences so that future changes are informed rather than accidental.
 
 **Relationship to CHANGELOG:** When a decision triggers a `CONTRACT_CHANGE` commit, the change MUST also be logged in CHANGELOG with a cross-reference to the ADR ID.
 
@@ -110,38 +110,121 @@ Copy this block for each new decision:
 
 ---
 
-## ADR-0001: [First decision title]
+## ADR-0001: Agent target abstraction with framework-specific implementations
 
-- **Date:** YYYY-MM-DD
-- **Status:** Proposed
+- **Date:** 2026-03-14
+- **Status:** Accepted
 
 ### Context
-*(Describe the problem and constraints. Cite authority documents by tier and section.)*
+PROJECT_BRIEF §7 requires testing attacks against 3 frameworks (LangChain, CrewAI, AutoGen). Each has a completely different API surface. Need a common interface so attacks are written once and run against all targets. (Tier 1 §3: "Open-source red-team framework" implies reusable architecture, not one-off scripts.)
 
 ### Decision
-*(State the chosen approach with enough specificity to implement.)*
+Abstract base class `AgentTarget` with 6 methods: `setup()`, `run_task()`, `reset()`, `get_system_prompt()`, `get_tools()`, `inject_context()`. Each framework gets its own implementation. Attacks interact ONLY through this interface.
 
 ### Alternatives Considered
 
 | Option | Description | Verdict | Reason |
 |--------|-------------|---------|--------|
-| A (chosen) | *(approach)* | **Accepted** | *(why best)* |
-| B | *(approach)* | Rejected | *(why not)* |
+| A (chosen) | ABC with per-framework implementations | **Accepted** | Attacks written once, N frameworks. Clean separation. |
+| B | Direct framework calls in each attack script | Rejected | 5 attacks × 3 frameworks = 15 scripts. Duplication. |
+| C | Adapter pattern with runtime dispatch | Rejected | Over-engineered for 3 targets. ABC is simpler. |
 
 ### Rationale
-*(Why this is the best choice given project constraints.)*
+RQ2 requires demonstrating attacks across ≥2 frameworks. The abstraction makes this a config change, not a code change. Also enables the CLI tool (PROJECT_BRIEF §8: "pip install agent-redteam") to accept `--agent` flags cleanly.
 
 ### Consequences
-*(Tradeoffs, risks, downstream effects. Reference RISK_REGISTER entries.)*
+- Each new framework target requires implementing 6 methods (~100 lines)
+- Tests must cover the interface contract, not just one framework
+- `inject_context()` and `get_conversation_history()` have framework-specific semantics
 
 ### Contracts Affected
 
 | Contract | Section | Change Required |
 |----------|---------|----------------|
-| *(contract)* | §N | *(what changes)* |
+| SCRIPT_ENTRYPOINTS_SPEC | §CLI flags | All scripts accept `--agent` flag |
+| TEST_ARCHITECTURE | §integration | Per-framework smoke tests |
+| CONFIGURATION_SPEC | §agents | Agent configs in config/agents/*.yaml |
 
 ### Evidence Plan
 
 | Validation | Command / Artifact | Expected Result |
 |------------|-------------------|-----------------|
-| *(what to verify)* | *(command or file)* | *(pass criteria)* |
+| LangChain smoke test | `python scripts/smoke_test_agents.py --agent langchain` | PASS — tool call + correct answer |
+| Dry-run all agents | `python scripts/smoke_test_agents.py --dry-run` | All 3 PASS |
+
+---
+
+## ADR-0002: Controlled tool suite instead of real tool access
+
+- **Date:** 2026-03-14
+- **Status:** Accepted
+
+### Context
+Red-teaming agents requires tools they can misuse. Using real tools (filesystem, network, shell) creates safety risks. Need tools that are interesting enough to demonstrate attacks but can't cause real harm. (PROJECT_BRIEF §3 Out of Scope: "Attacking production/deployed agents")
+
+### Decision
+In-memory tool suite: `calculator` (safe eval), `search_notes` (dict lookup), `file_reader`/`file_writer` (in-memory dict). `reset_tool_state()` clears state between scenarios. Tool data includes simulated sensitive content ("api_keys", "secret_plan") for red-team scenarios.
+
+### Alternatives Considered
+
+| Option | Description | Verdict | Reason |
+|--------|-------------|---------|--------|
+| A (chosen) | In-memory mock tools with simulated sensitive data | **Accepted** | Safe, deterministic, resettable |
+| B | Sandboxed real filesystem (tempdir) | Rejected | Harder to reset, OS-dependent edge cases |
+| C | Docker-isolated real tools | Rejected | Heavy infra for a research project |
+
+### Rationale
+Mock tools are sufficient to demonstrate all 5 attack classes. Tool misuse attacks target the permission boundary, not the tool implementation. In-memory tools give perfect determinism for multi-seed experiments.
+
+### Consequences
+- Findings may not generalize to real tool environments (acknowledged limitation)
+- `reset_tool_state()` must be called between scenarios or memory poisoning bleeds across tests
+
+### Contracts Affected
+
+| Contract | Section | Change Required |
+|----------|---------|----------------|
+| ADVERSARIAL_EVALUATION | §3.1b Feature Controllability | Tool outputs = partially controllable |
+| DATA_CONTRACT | §data sources | "Self-generated" — no external dataset |
+
+### Evidence Plan
+
+| Validation | Command / Artifact | Expected Result |
+|------------|-------------------|-----------------|
+| Tool isolation | Unit test: reset between scenarios | State cleared |
+| Sensitive data accessible | `search_notes("api_keys")` returns result | Agent can find simulated secrets |
+
+---
+
+## ADR-0003: Anthropic Claude as primary LLM backend, OpenAI as secondary
+
+- **Date:** 2026-03-14
+- **Status:** Accepted
+
+### Context
+Agent targets need an LLM backend. PROJECT_BRIEF §7 says "Claude API or OpenAI API — configurable." Need to pick a primary for development velocity while maintaining portability.
+
+### Decision
+Anthropic Claude (claude-sonnet-4-20250514) as primary. `config/base.yaml` controls provider. LangChain abstracts the LLM layer — switching is a config change. Budget: ~$20-50 in tokens.
+
+### Alternatives Considered
+
+| Option | Description | Verdict | Reason |
+|--------|-------------|---------|--------|
+| A (chosen) | Claude primary, OpenAI secondary | **Accepted** | Brand alignment (AI Security Architecture on Anthropic stack), cost-effective with Sonnet |
+| B | OpenAI primary | Rejected | No brand alignment, similar cost |
+| C | Local LLM (Ollama) | Rejected | Weaker tool-calling, no GPU on VM. Stretch goal. |
+
+### Rationale
+Using Claude for red-teaming Claude-powered agents is the most authentic test. Blog post angle: "I red-teamed agents running on the same model family I used to build the framework." Also avoids OPENAI_API_KEY dependency for primary development.
+
+### Consequences
+- API costs tracked per-scenario in attack logs
+- Must validate key findings on OpenAI backend before publishing (RQ generalization)
+
+### Contracts Affected
+
+| Contract | Section | Change Required |
+|----------|---------|----------------|
+| CONFIGURATION_SPEC | §base | `llm.provider` and `llm.model` fields |
+| ENVIRONMENT_CONTRACT | §API keys | ANTHROPIC_API_KEY required |

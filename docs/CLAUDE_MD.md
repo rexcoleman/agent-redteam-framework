@@ -24,14 +24,14 @@ Build an open-source framework for systematically red-teaming autonomous AI agen
 
 ## Current Phase
 
-**Phase:** 0 — Environment & Agent Setup
+**Phase:** 1 — Attack Taxonomy & Baselines
 
 ### Phase Progression
 
 | Phase | Name | Status |
 |-------|------|--------|
-| 0 | Environment & Agent Setup | **CURRENT** |
-| 1 | Attack Taxonomy & Script Development | Not started |
+| 0 | Environment & Agent Setup | **COMPLETE** (smoke test passed 2026-03-14) |
+| 1 | Attack Taxonomy & Baselines | **CURRENT** |
 | 2 | Red-Team Execution | Not started |
 | 3 | Adversarial Control Analysis + Defenses | Not started |
 | 4 | Findings & Publication Draft | Not started |
