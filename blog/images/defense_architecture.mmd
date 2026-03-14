@@ -1,0 +1,26 @@
+graph TD
+    A["User Input<br/>(Attacker-Controlled)"] --> B
+
+    subgraph Defense["Layered Defense Architecture"]
+        B["Layer 1: Input Sanitizer<br/>Regex pattern detection<br/><i>Blocks: prompt injection, memory poisoning</i>"]
+        B -->|"No patterns detected"| C
+        B -->|"Pattern matched"| BLOCK1["BLOCKED<br/>Request denied"]
+        C["Layer 2: Tool Permission Boundary<br/>Write-intent verification + rate limiting<br/><i>Blocks: unauthorized writes, loop manipulation</i>"]
+        C -->|"Within policy"| D
+        C -->|"Violation detected"| BLOCK2["BOUNDARY VIOLATION<br/>Response suppressed"]
+    end
+
+    D["Agent<br/>(LangChain ReAct + Claude Sonnet)"]
+    D --> E["Tool Calls"]
+    E --> F["calculator"]
+    E --> G["search_notes"]
+    E --> H["file_reader"]
+    E --> I["file_writer<br/><i>(sensitive)</i>"]
+    D --> J["Response to User"]
+
+    style BLOCK1 fill:#ff6b6b,stroke:#c0392b,color:#fff
+    style BLOCK2 fill:#ff6b6b,stroke:#c0392b,color:#fff
+    style B fill:#3498db,stroke:#2980b9,color:#fff
+    style C fill:#3498db,stroke:#2980b9,color:#fff
+    style D fill:#2ecc71,stroke:#27ae60,color:#fff
+    style I fill:#f39c12,stroke:#e67e22,color:#fff

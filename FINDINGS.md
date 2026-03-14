@@ -41,7 +41,7 @@ We built an open-source framework for systematically red-teaming autonomous AI a
 
 ## RQ2: Can Attacks Be Executed? — Yes, 4 of 5 Classes Demonstrated
 
-**Result: 4 attack classes demonstrated with >50% success rate against LangChain ReAct + Claude Sonnet.**
+**Result: 4 attack classes demonstrated with >50% success rate against LangChain ReAct + Claude Sonnet. Prompt injection validated on CrewAI (80% — same rate as LangChain).**
 
 | Class | Scenarios | Success | Rate | Demonstrated? |
 |-------|-----------|---------|------|--------------|
@@ -157,7 +157,7 @@ For organizations deploying autonomous AI agents:
 
 ## Limitations
 
-- Single agent framework (LangChain ReAct). CrewAI and AutoGen targets not yet tested.
+- Two agent frameworks tested (LangChain ReAct, CrewAI). AutoGen target defined but not yet tested.
 - Single LLM backend (Claude Sonnet). Results may differ on GPT-4, Llama, etc.
 - Single seed (42). Multi-seed validation pending.
 - Controlled tools (in-memory). Real-world tools may have different attack surfaces.

@@ -1,6 +1,6 @@
 # I Red-Teamed AI Agents: Here's How They Break (and How to Fix Them)
 
-I sent 19 attack scenarios at a LangChain ReAct agent powered by Claude Sonnet. 13 succeeded. The most dangerous attack class — reasoning chain hijacking — has a 100% success rate and partially evades every defense I built. Here's what I found, what I built to find it, and what it means for anyone shipping autonomous agents.
+I sent 19 attack scenarios at a LangChain ReAct agent powered by Claude Sonnet. 13 succeeded. I then validated the attacks on CrewAI — same results. The most dangerous attack class — reasoning chain hijacking — has a 100% success rate and partially evades every defense I built. Here's what I found, what I built to find it, and what it means for anyone shipping autonomous agents.
 
 ## What I Built
 
@@ -20,6 +20,8 @@ OWASP's LLM Top 10 and MITRE ATLAS cover model-level vulnerabilities — prompt 
 That reasoning loop is the vulnerability.
 
 ## The Attack Taxonomy
+
+![Attack Success Rates](images/attack_success_rates.png)
 
 I identified 7 attack classes. The first two exist in current frameworks. The other five are agent-specific:
 
@@ -86,6 +88,8 @@ I built three defense layers and measured their effectiveness:
 | Reasoning Hijack | 100% | 67% | **33%** |
 | **Average** | **68%** | **18%** | **60%** |
 
+![Defense Comparison](images/defense_comparison.png)
+
 The layered defense reduces overall attack success by 60%. But reasoning chain hijacking only drops from 100% to 67%. The gap is real.
 
 ## The Controllability Insight
@@ -99,6 +103,8 @@ The deeper finding is architectural: **attack success correlates inversely with 
 | Conversation history | Partially (history audit) | 67% |
 | Tool outputs | Partially (output logging) | 25% |
 | **Reasoning chain** | **No (internal state)** | **100%** |
+
+![Controllability Analysis](images/controllability_analysis.png)
 
 The reasoning chain is the least observable input — it's internal to the agent's processing loop. That's why it has the highest attack success rate. This isn't a coincidence. It's the same pattern I found in network intrusion detection (where attacker-controlled features are the attack surface) and vulnerability prediction (where exploit metadata is attacker-influenced). **Controllability analysis is a general security architecture principle.**
 

@@ -32,8 +32,12 @@ def create_agent(agent_name: str, config: dict, llm_config: dict):
         from src.agents.langchain_target import LangChainReActTarget
         agent_config = get_agent_config(config, agent_name)
         return LangChainReActTarget(config=agent_config, llm_config=llm_config)
+    elif agent_name == "crewai_multi":
+        from src.agents.crewai_target import CrewAIMultiAgentTarget
+        agent_config = get_agent_config(config, agent_name)
+        return CrewAIMultiAgentTarget(config=agent_config, llm_config=llm_config)
     else:
-        raise ValueError(f"Agent '{agent_name}' not yet implemented. Available: langchain_react")
+        raise ValueError(f"Agent '{agent_name}' not yet implemented. Available: langchain_react, crewai_multi")
 
 
 def run_baselines(agent_name: str, seed: int, task_id: str | None = None, dry_run: bool = False):

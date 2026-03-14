@@ -1,0 +1,42 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.backends._legacy:_Backend"
+
+[project]
+name = "agent-redteam"
+version = "0.1.0"
+description = "Open-source framework for systematically red-teaming autonomous AI agents"
+readme = "README.md"
+license = {text = "MIT"}
+requires-python = ">=3.11"
+authors = [
+    {name = "Rex Coleman"},
+]
+keywords = ["ai", "security", "red-team", "agents", "langchain", "adversarial"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Topic :: Security",
+    "Programming Language :: Python :: 3.11",
+]
+dependencies = [
+    "langchain>=1.0.0",
+    "langchain-anthropic>=0.3.0",
+    "langgraph>=1.0.0",
+    "crewai>=1.0.0",
+    "click>=8.0",
+    "rich>=13.0",
+    "pyyaml>=6.0",
+    "tqdm>=4.0",
+    "matplotlib>=3.8",
+]
+
+[project.scripts]
+agent-redteam = "src.cli:cli"
+
+[project.urls]
+Homepage = "https://github.com/rexcoleman/agent-redteam-framework"
+Repository = "https://github.com/rexcoleman/agent-redteam-framework"
+
+[tool.setuptools.packages.find]
+include = ["src*"]

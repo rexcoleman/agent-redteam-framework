@@ -1,0 +1,18 @@
+graph LR
+    subgraph High["HIGH Observability → LOW Attack Success"]
+        UP["User Prompt<br/>Attacker-Controlled<br/>Defender: Input filtering<br/><b>80% attack success</b>"]
+        TP["Tool Parameters<br/>Attacker-Controlled<br/>Defender: Param validation<br/><b>75% attack success</b>"]
+    end
+
+    subgraph Medium["PARTIAL Observability → MEDIUM Attack Success"]
+        CH["Conversation History<br/>Poisonable<br/>Defender: History audit<br/><b>67% attack success</b>"]
+        TO["Tool Outputs<br/>Partially Controllable<br/>Defender: Output logging<br/><b>25% attack success</b>"]
+    end
+
+    subgraph Low["NO Observability → HIGHEST Attack Success"]
+        RC["Reasoning Chain<br/>Partially Controllable<br/>Defender: Cannot observe<br/><b>100% attack success</b>"]
+    end
+
+    style High fill:#2ecc71,stroke:#27ae60,color:#fff
+    style Medium fill:#f39c12,stroke:#e67e22,color:#fff
+    style Low fill:#e74c3c,stroke:#c0392b,color:#fff

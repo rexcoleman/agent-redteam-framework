@@ -1,0 +1,22 @@
+graph TD
+    ROOT["Agent Attack Surface"] --> EXISTING["Existing Frameworks<br/>(OWASP / ATLAS)"]
+    ROOT --> NOVEL["Novel Agent-Specific<br/>(This Research)"]
+
+    EXISTING --> C1["Class 1: Direct Prompt Injection<br/><b>80% success</b><br/>OWASP LLM01"]
+    EXISTING --> C2["Class 2: Indirect Injection via Tools<br/><b>25% success</b><br/>Partial OWASP LLM01"]
+
+    NOVEL --> C3["Class 3: Tool Permission<br/>Boundary Violation<br/><b>75% success</b>"]
+    NOVEL --> C4["Class 4: Cross-Agent<br/>Privilege Escalation<br/><i>(defined, not yet tested)</i>"]
+    NOVEL --> C5["Class 5: Memory/Context<br/>Poisoning<br/><b>67% success</b>"]
+    NOVEL --> C6["Class 6: Reasoning Chain<br/>Hijacking<br/><b>100% success</b>"]
+    NOVEL --> C7["Class 7: Output Format<br/>Exploitation<br/><i>(defined, not yet tested)</i>"]
+
+    style C6 fill:#e74c3c,stroke:#c0392b,color:#fff
+    style C3 fill:#e67e22,stroke:#d35400,color:#fff
+    style C5 fill:#e67e22,stroke:#d35400,color:#fff
+    style C1 fill:#f39c12,stroke:#e67e22,color:#fff
+    style C2 fill:#2ecc71,stroke:#27ae60,color:#fff
+    style C4 fill:#95a5a6,stroke:#7f8c8d,color:#fff
+    style C7 fill:#95a5a6,stroke:#7f8c8d,color:#fff
+    style NOVEL fill:#3498db,stroke:#2980b9,color:#fff
+    style EXISTING fill:#95a5a6,stroke:#7f8c8d,color:#fff
