@@ -1,0 +1,19 @@
+name: agent-redteam
+channels:
+  - defaults
+  - conda-forge
+dependencies:
+  - python=3.11
+  - pip
+  - pytest
+  - pip:
+    - langchain>=0.3.0
+    - langchain-openai>=0.3.0
+    - langchain-anthropic>=0.3.0
+    - crewai>=0.80.0
+    - autogen-agentchat>=0.4.0
+    - click
+    - rich
+    - requests
+    - pyyaml
+    - tqdm

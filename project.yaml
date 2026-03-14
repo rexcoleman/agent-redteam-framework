@@ -1,0 +1,138 @@
+# project.yaml — Self-Directed Research Project Example
+#
+# Use this example for portfolio projects, frontier research, blog-track projects,
+# or any self-directed work WITHOUT an external rubric/assignment spec.
+#
+# Key differences from the academic example (project.yaml.example):
+#   - authority.tier1 = PROJECT_BRIEF.md (your own thesis, not a course spec)
+#   - authority.tier2 = null (no FAQ document)
+#   - No rubric section (research questions replace rubric traceability)
+#   - Publication target included
+#   - Skill cluster targets included
+
+project:
+  name: "Adversarial ML on Network Intrusion Detection"
+  # No course field — this is self-directed research
+  profile: security-ml
+  python_version: "3.11"
+  conda_env: "adversarial-ids"
+
+# Authority hierarchy — for self-directed projects, PROJECT_BRIEF is Tier 1
+authority:
+  tier1: "docs/PROJECT_BRIEF.md"       # Your thesis + research questions = highest authority
+  tier2: null                           # No external FAQ
+  tier3: "docs/ADVERSARIAL_EVALUATION.md"  # Advisory — domain-specific methodology
+
+# Publication target
+publication:
+  title: "Adversarial ML on Network Intrusion Detection: What Feature Controllability Reveals"
+  pillar: "AI Security Architecture"    # AI Security Architecture | ML Systems Governance | Builder-in-Public
+  venue: "blog"                         # blog | conference | journal
+  target_date: "2026-04-01"
+
+# Skill cluster targets — what this project advances
+skill_clusters:
+  L: { current: "L3+", target: "L4", how: "Agent-assisted experiment orchestration" }
+  S: { current: "S1-S2", target: "S2-S3", how: "Novel adversarial findings on IDS" }
+  P: { current: "P2++", target: "P3", how: "Full pipeline with CI/CD" }
+  D: { current: "D3", target: "D3-D4", how: "Architectural decisions under real constraints" }
+  V: { current: "V1", target: "V1-V2", how: "Published blog post + GitHub repo" }
+
+# Experiment matrix
+experiments:
+  seeds: [42, 123, 456]
+  parts:
+    - name: baselines
+      methods: [random_forest, xgboost, logistic_regression]
+      datasets: [cicids2017]
+      script: "scripts/train_baselines.py"
+      flags: "--sample-frac 1.0"         # Use --sample-frac 0.01 for smoke testing
+      output_dir: "outputs/baselines"
+    - name: adversarial_attacks
+      methods: [zoo, noise_uniform, noise_gaussian]
+      datasets: [cicids2017]
+      script: "scripts/adversarial_attacks.py"
+      flags: "--epsilon 0.1"
+      output_dir: "outputs/attacks"
+    - name: defenses
+      methods: [adversarial_training, feature_squeezing, controllability_filter]
+      datasets: [cicids2017]
+      script: "scripts/defenses.py"
+      output_dir: "outputs/defenses"
+
+# Dataset definition
+datasets:
+  - name: cicids2017
+    source: "Canadian Institute for Cybersecurity"
+    download_method: "manual_portal"     # direct_url | api | kaggle_cli | manual_portal
+    download_url: "https://www.unb.ca/cic/datasets/ids-2017.html"
+    manual_steps: "Register at CIC portal, download CSVs, scp to data/raw/"
+    known_issues:
+      - "Leading spaces in column names"
+      - "Inf values in Flow Bytes/s and Flow Packets/s"
+      - "Inconsistent label whitespace"
+    sha256: null  # Set after first download + verification
+    local_path: "data/raw/"
+    splits:
+      method: "StratifiedShuffleSplit"
+      seed: 42
+      ratios: "70/15/15"
+      min_class_members: 10    # Safe default for 3-way stratified split (ISS-023)
+
+# Config hierarchy (if applicable)
+config:
+  base: "config/base.yaml"
+  layers:
+    - pattern: "config/attack/*.yaml"
+    - pattern: "config/defense/*.yaml"
+  resolved_output: "config_resolved.yaml"
+
+# Phase definitions
+phases:
+  - name: "Phase 0 — Environment & Data"
+    checks:
+      - command: "bash scripts/preflight.sh"
+        description: "Disk space and resource pre-flight check"
+      - command: "bash scripts/verify_env.sh"
+        description: "Environment verification"
+      - command: "python scripts/check_data_ready.py"
+        description: "Data presence and integrity"
+      - command: "git remote -v"
+        description: "Git remote configured"
+  - name: "Phase 1 — EDA & Preprocessing"
+    checks:
+      - command: "python scripts/check_leakage.py"
+        description: "Leakage tripwires pass"
+  - name: "Phase 2 — Baselines"
+    checks:
+      - command: "python scripts/train_baselines.py --sample-frac 0.01 --seed 42"
+        description: "Smoke test on 1% data"
+  - name: "Phase 3 — Adversarial Attacks"
+    checks:
+      - command: "python scripts/adversarial_attacks.py --sample-frac 0.01 --seed 42"
+        description: "Attack smoke test"
+  - name: "Phase 4 — Defenses & Findings"
+    checks:
+      - command: "python scripts/verify_manifests.py"
+        description: "All artifacts verified"
+
+# Artifact manifest
+artifacts:
+  run_id_pattern: "{part}_{method}_{dataset}_seed{seed}"
+  per_run_files:
+    - "summary.json"
+    - "config_resolved.yaml"
+  hash_algorithm: "sha256"
+  manifest_file: "outputs/manifest.json"
+
+# AI governance
+ai_governance:
+  tools:
+    - name: "Claude Code"
+      role: "Coding copilot, test generation, script execution, governance audit"
+      prohibited: "Must not generate analysis prose, conclusions, or hypothesis resolutions"
+    - name: "GitHub Copilot"
+      role: "Inline code completion"
+      prohibited: "Must not auto-generate entire functions without review"
+  anti_ghostwriting: true
+  test_set_barrier: true
