@@ -68,6 +68,63 @@ The threat model MUST be defined before any adversarial evaluation begins. It co
 | **Perturbation budget (ε)** | {{EPSILON_VALUES}} |
 | **Attack surface** | *(test-time inputs / training data / reward signal / environment dynamics)* |
 
+### 2b) Formal Threat Model (YAML)
+
+```yaml
+threat_model:
+  adversary_knowledge: black_box  # No access to model weights or system prompts
+  adversary_capability:
+    perturbation_type: semantic  # Natural language prompt manipulation
+    perturbation_budget:
+      norm: semantic
+      epsilon: "unconstrained — any natural language input"
+    access:
+      - user_input_channel  # Can send arbitrary text as task input
+    constraints:
+      - "Cannot modify system prompt"
+      - "Cannot modify tool implementations"
+      - "Cannot access model weights or internal state"
+      - "Single-turn attack only (no multi-turn adaptation)"
+  adversary_goal: integrity  # Cause agent to perform unintended actions
+  attack_surface:
+    controllable_features: [task_description, embedded_instructions, data_content]
+    observable_features: [agent_response_text, tool_call_names]
+    system_features: [system_prompt, tool_implementations, model_weights, temperature]
+  attacks_tested:
+    - type: direct_prompt_injection
+      sophistication: low
+      tool: custom YAML scenarios
+    - type: indirect_prompt_injection
+      sophistication: medium
+      tool: custom YAML scenarios
+    - type: reasoning_chain_hijacking
+      sophistication: high
+      tool: custom YAML scenarios (polite step-by-step)
+    - type: tool_misuse_via_instruction
+      sophistication: medium
+      tool: custom YAML scenarios
+    - type: data_exfiltration_via_output
+      sophistication: medium
+      tool: custom YAML scenarios
+  attacks_NOT_tested:
+    - type: multi_turn_adaptive
+      reason: "Current framework tests single-turn attacks only"
+    - type: GPT-4_backend
+      reason: "Only Claude 3.5 Sonnet tested; other LLM backends not validated"
+    - type: Gemini_backend
+      reason: "Same — only Claude backend"
+    - type: hardened_agent_with_system_prompt
+      reason: "Only default-configured agents tested; production-hardened agents with defensive system prompts not tested"
+    - type: defense_aware_adaptive
+      reason: "Attacker does not know about or adapt to LLM-as-judge defense"
+  limitation_acknowledgment: |
+    All attacks tested against default-configured LangChain ReAct and CrewAI agents
+    with Claude 3.5 Sonnet backend at temperature=0. Not tested: GPT-4, Gemini, or
+    other backends. Not tested: agents with hardened system prompts, output validators,
+    or restricted tool sets. Not tested: adaptive attacks that know about and try to
+    bypass defenses. Single-turn attacks only.
+```
+
 **Rule:** The threat model MUST be documented in the report Methods section before adversarial experiments run.
 
 **Verification:** Report Methods section contains a threat model paragraph specifying all properties above. `config_resolved.yaml` records `threat_model`, `perturbation_norm`, and `epsilon` for every adversarial run.
