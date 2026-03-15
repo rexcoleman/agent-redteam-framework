@@ -40,7 +40,7 @@ Build an open-source framework for systematically red-teaming autonomous AI agen
 
 | # | Question | Key |
 |---|----------|-----|
-| RQ1 | What is the attack taxonomy for autonomous AI agents? | ≥5 novel classes beyond OWASP/ATLAS |
+| RQ1 | What is the attack taxonomy for autonomous AI agents? | ≥5 classes not covered by OWASP/ATLAS |
 | RQ2 | Can attacks be executed against real open-source agents? | ≥3 classes demonstrated, >50% success |
 | RQ3 | Does adversarial control analysis apply to agents? | Controllability matrix + robustness differential |
 | RQ4 | What defenses reduce agent attack surface? | ≥2 defenses, >50% reduction |

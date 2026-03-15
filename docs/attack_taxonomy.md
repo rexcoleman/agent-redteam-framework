@@ -1,7 +1,7 @@
 # Agent Attack Taxonomy — FP-02
 
 > **Authority:** Subordinate to PROJECT_BRIEF (Tier 1) RQ1
-> **Success criterion:** ≥5 attack classes NOT in OWASP LLM Top 10 or MITRE ATLAS
+> **Success criterion:** ≥5 attack classes not covered by OWASP LLM Top 10 or MITRE ATLAS
 > **Created:** 2026-03-14
 > **Status:** DRAFT — pre-registration for Phase 2 execution
 
@@ -34,7 +34,7 @@ Covers ML model attacks (evasion, poisoning, extraction) but has minimal coverag
 
 ---
 
-## Novel Attack Taxonomy (Agent-Specific)
+## Agent-Specific Attack Taxonomy
 
 ### Classification Axes
 
@@ -76,41 +76,41 @@ Covers ML model attacks (evasion, poisoning, extraction) but has minimal coverag
 - 2b: File content injection (file contains prompt injection payload)
 - 2c: Cascading tool manipulation (tool A output causes agent to call tool B with attacker-controlled params)
 
-### Class 3: Tool Permission Boundary Violation (NEW — not in OWASP/ATLAS)
+### Class 3: Tool Permission Boundary Violation (Systematized — not in OWASP/ATLAS)
 **What:** Agent is tricked into using tools beyond its intended scope or with unauthorized parameters.
-**Why novel:** OWASP LLM07 covers "insecure plugin design" (the tool is insecure). This class covers **the agent using a secure tool insecurely** — the tool works correctly but the agent's use of it violates intended boundaries.
+**Agent-specific framing:** OWASP LLM07 covers "insecure plugin design" (the tool is insecure). This class covers **the agent using a secure tool insecurely** — the tool works correctly but the agent's use of it violates intended boundaries. The concept of tool misuse is well-known; this systematizes it for the agent context.
 **Variants:**
 - 3a: Parameter escalation (agent passes dangerous parameters to a safe tool)
 - 3b: Tool chain abuse (agent chains tools in unintended sequence to achieve unauthorized action)
 - 3c: Implicit permission assumption (agent assumes it has permission because no explicit denial)
 
-### Class 4: Cross-Agent Privilege Escalation (NEW — not in OWASP/ATLAS)
+### Class 4: Cross-Agent Privilege Escalation (Systematized — not in OWASP/ATLAS)
 **What:** In multi-agent systems, a compromised or manipulated agent delegates tasks to other agents, escalating privileges across the system.
-**Why novel:** OWASP/ATLAS focus on single-model attacks. Multi-agent delegation is an emergent attack surface with no framework coverage.
+**Agent-specific framing:** Privilege escalation is a well-known security concept. OWASP/ATLAS focus on single-model attacks. Multi-agent delegation as a privilege escalation vector is the agent-specific framing not covered by existing frameworks.
 **Variants:**
 - 4a: Delegation abuse (researcher agent tricks writer agent into writing to unauthorized locations)
 - 4b: Role confusion (agent assumes another agent's permissions during delegation)
 - 4c: Message injection (attacker injects messages into cross-agent communication channel)
 
-### Class 5: Memory/Context Poisoning (NEW — not in OWASP/ATLAS)
+### Class 5: Memory/Context Poisoning (Systematized — not in OWASP/ATLAS)
 **What:** Attacker manipulates the agent's conversation history, persistent memory, or shared context to influence future behavior.
-**Why novel:** Stateless LLM attacks reset each turn. Agents with memory carry poisoned state forward, making single injections persistent.
+**Agent-specific framing:** Data poisoning is a well-known attack concept. The agent-specific dimension is that stateless LLM attacks reset each turn, while agents with memory carry poisoned state forward, making single injections persistent.
 **Variants:**
 - 5a: History injection (inject fake prior turns into conversation history)
 - 5b: Context window manipulation (fill context window to push out system prompt / safety instructions)
 - 5c: Persistent backdoor (inject instruction into persistent memory that activates on trigger)
 
-### Class 6: Reasoning Chain Hijacking (NEW — not in OWASP/ATLAS)
+### Class 6: Reasoning Chain Hijacking (Novel pattern — not in OWASP/ATLAS)
 **What:** Attacker manipulates the agent's multi-step reasoning process, not just the final output. Targets the ReAct loop (Thought → Action → Observation cycle).
-**Why novel:** OWASP focuses on input→output. Agent reasoning chains are multi-step — attacking the REASONING PROCESS (not just the input) is a fundamentally different attack surface.
+**Why this is the strongest novelty claim:** OWASP focuses on input to output. Agent reasoning chains are multi-step — attacking the REASONING PROCESS via structured step-by-step instructions that look like legitimate tasks is a distinct, previously unnamed attack pattern. Unlike prompt injection (well-documented) or data poisoning (well-known concept), reasoning chain hijacking exploits the agent's core capability as the attack vector, and no existing framework names or addresses it.
 **Variants:**
 - 6a: Thought injection (influence the agent's "thinking" step to change tool selection)
 - 6b: Observation override (make the agent misinterpret a tool's output)
 - 6c: Loop manipulation (cause the agent to enter infinite tool-calling loops or skip steps)
 
-### Class 7: Output Format Exploitation (NEW — not in OWASP/ATLAS)
+### Class 7: Output Format Exploitation (Systematized — not in OWASP/ATLAS)
 **What:** Attacker exploits how agent outputs are parsed by downstream systems. Agents produce structured output (JSON, function calls) that other systems consume — format manipulation can bypass downstream security.
-**Why novel:** LLM output is typically text. Agent output includes structured data (tool calls, JSON, API parameters) consumed by code. Format exploitation is an agent-specific attack vector.
+**Agent-specific framing:** Output manipulation is a known concept (cf. OWASP LLM02 Insecure Output Handling). The agent-specific dimension is that agent output includes structured data (tool calls, JSON, API parameters) consumed by code, not just text consumed by humans.
 **Variants:**
 - 7a: JSON injection (inject malicious fields into structured agent output)
 - 7b: Tool call spoofing (make agent output look like a tool call to downstream parser)
@@ -120,17 +120,17 @@ Covers ML model attacks (evasion, poisoning, extraction) but has minimal coverag
 
 ## Novelty Assessment
 
-| Class | In OWASP? | In ATLAS? | Novel? | Implementable in FP-02? |
+| Class | In OWASP? | In ATLAS? | Status | Implementable in FP-02? |
 |-------|-----------|-----------|--------|------------------------|
-| 1: Direct Prompt Injection | Yes (LLM01) | Partial | No — baseline | Yes (reference) |
-| 2: Indirect via Tool Outputs | Partial (LLM01) | No | **Partially new** — agent tool chain context | Yes |
-| 3: Tool Permission Boundary | Partial (LLM07) | No | **Yes** — agent USE of tools, not tool design | Yes |
-| 4: Cross-Agent Privilege Escalation | No | No | **Yes** — multi-agent specific | Yes (CrewAI) |
-| 5: Memory/Context Poisoning | No | No | **Yes** — persistence is agent-specific | Yes |
-| 6: Reasoning Chain Hijacking | No | No | **Yes** — ReAct loop specific | Yes |
-| 7: Output Format Exploitation | Partial (LLM02) | No | **Yes** — structured agent output specific | Yes |
+| 1: Direct Prompt Injection | Yes (LLM01) | Partial | Known — baseline | Yes (reference) |
+| 2: Indirect via Tool Outputs | Partial (LLM01) | No | **Partially known** — agent tool chain context adds specificity | Yes |
+| 3: Tool Permission Boundary | Partial (LLM07) | No | **Systematized** — concept of tool misuse exists; agent USE of secure tools insecurely is the agent-specific framing | Yes |
+| 4: Cross-Agent Privilege Escalation | No | No | **Systematized** — privilege escalation is well-known; multi-agent delegation context is the agent-specific framing | Yes (CrewAI) |
+| 5: Memory/Context Poisoning | No | No | **Systematized** — data poisoning is well-known; persistent agent memory as attack surface is the agent-specific framing | Yes |
+| 6: Reasoning Chain Hijacking | No | No | **Novel pattern** — exploiting the ReAct reasoning loop via structured instructions is a distinct, previously unnamed attack pattern | Yes |
+| 7: Output Format Exploitation | Partial (LLM02) | No | **Systematized** — output manipulation is known; structured agent output (JSON, tool calls) consumed by code is the agent-specific framing | Yes |
 
-**Novel classes (beyond OWASP/ATLAS): 5** (Classes 3, 4, 5, 6, 7) — meets RQ1 criterion of ≥5.
+**Classes not covered by OWASP/ATLAS: 5** (Classes 3, 4, 5, 6, 7). Of these, reasoning chain hijacking (Class 6) is the strongest novelty claim as a named attack pattern. Classes 3, 4, 5, and 7 systematize known security concepts (tool misuse, privilege escalation, data poisoning, output manipulation) into an agent-specific taxonomy.
 
 ---
 
@@ -168,4 +168,5 @@ Covers ML model attacks (evasion, poisoning, extraction) but has minimal coverag
 
 | Date | Change |
 |------|--------|
-| 2026-03-14 | Initial taxonomy: 7 classes, 5 novel beyond OWASP/ATLAS |
+| 2026-03-14 | Initial taxonomy: 7 classes, 5 not covered by OWASP/ATLAS |
+| 2026-03-15 | Novelty calibration: Classes 3-5, 7 reframed as "systematized from existing concepts"; Class 6 (reasoning chain hijacking) retained as strongest novelty claim |

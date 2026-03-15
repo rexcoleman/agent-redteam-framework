@@ -32,7 +32,7 @@
 | **Working title** | I Red-Teamed AI Agents: Here's How They Break (and How to Fix Them) |
 | **Content pillar** | AI Security Architecture (40% pillar) |
 | **Target audience** | P1: Security engineers building with AI agents. P2: Engineering managers evaluating agent safety. P3: AI security hiring managers (brand signal). |
-| **One-line thesis** | Reasoning chain hijacking — a novel attack where structured step-by-step instructions exploit an agent's core capability — achieves 100% success rate and partially evades all current defenses. |
+| **One-line thesis** | Reasoning chain hijacking — an attack pattern where structured step-by-step instructions exploit an agent's core capability — achieves 100% success rate against default-configured agents and partially evades all current defenses. |
 | **What was shipped** | github.com/rexcoleman/agent-redteam-framework — open-source red-team framework with 7 attack classes, 19 scenarios, and layered defense architecture |
 
 ### Voice Check
@@ -72,7 +72,7 @@ Defense-in-depth layered architecture showing:
 
 | Claim | Evidence | Source |
 |-------|---------|-------|
-| 7 attack classes, 5 novel beyond OWASP/ATLAS | Taxonomy document | `docs/attack_taxonomy.md` |
+| 7 attack classes systematized, 5 not covered by OWASP/ATLAS (reasoning chain hijacking = strongest novelty claim) | Taxonomy document | `docs/attack_taxonomy.md` |
 | Reasoning chain hijacking: 100% success | 3/3 scenarios succeeded | `outputs/attacks/langchain_react_all_seed42/summary.json` |
 | Prompt injection: 80% success | 4/5 scenarios | Same |
 | Tool boundary violation: 75% success | 3/4 scenarios | Same |

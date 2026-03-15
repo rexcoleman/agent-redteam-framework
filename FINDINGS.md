@@ -10,32 +10,44 @@
 
 ## Executive Summary
 
-We built an open-source framework for systematically red-teaming autonomous AI agents and discovered that **reasoning chain hijacking** — a novel attack class not covered by OWASP or MITRE ATLAS — achieves **100% success rate** against a LangChain ReAct agent. A layered defense (input sanitization + tool permission boundaries) reduces overall attack success by **60%**, but reasoning chain attacks partially evade both layers because they use normal-sounding step-by-step instructions.
+We built an open-source framework for systematically red-teaming autonomous AI agents and discovered that **reasoning chain hijacking** — an attack pattern not covered by OWASP or MITRE ATLAS — achieves **100% success rate** [DEMONSTRATED] against default-configured LangChain ReAct agents with Claude Sonnet backend (3 seeds, temperature=0). A layered defense (input sanitization + tool permission boundaries) reduces overall attack success by **60%** [DEMONSTRATED], but reasoning chain attacks partially evade both layers because they use normal-sounding step-by-step instructions.
 
 **Key numbers:**
-- 7 attack classes identified (5 novel beyond existing frameworks)
-- 4 of 5 tested classes demonstrated at >50% success rate
-- 19 attack scenarios across 5 classes
-- Layered defense: 60% average attack reduction
+- 7 attack classes systematized into a reusable taxonomy [DEMONSTRATED] (5 not covered by existing frameworks)
+- 4 of 5 tested classes demonstrated at >50% success rate [DEMONSTRATED]
+- 19 attack scenarios across 5 classes [DEMONSTRATED]
+- Layered defense: 60% average attack reduction [DEMONSTRATED]
 - Total API cost: ~$2 in Claude Sonnet tokens
+- Generalization to other LLM backends (GPT-4, Gemini): [HYPOTHESIZED]
+
+---
+
+## Claim Strength Legend
+
+| Tag | Meaning |
+|-----|---------|
+| [DEMONSTRATED] | Directly measured, multi-seed, CI reported, raw data matches |
+| [SUGGESTED] | Consistent pattern but limited evidence (1-2 seeds, qualitative) |
+| [PROJECTED] | Extrapolated from partial evidence |
+| [HYPOTHESIZED] | Untested prediction |
 
 ---
 
 ## RQ1: Attack Taxonomy — What Can Go Wrong?
 
-**Result: 7 attack classes identified, 5 novel beyond OWASP LLM Top 10 and MITRE ATLAS.**
+**Result: 7 attack classes systematized into a reusable taxonomy, 5 not covered by OWASP LLM Top 10 or MITRE ATLAS.**
 
-| # | Class | Novel? | Target Surface | Controllability |
+| # | Class | Status | Target Surface | Controllability |
 |---|-------|--------|---------------|----------------|
 | 1 | Direct Prompt Injection | No (OWASP LLM01) | User input | Attacker-controlled |
 | 2 | Indirect Injection via Tools | Partial | Tool outputs | Partially controllable |
-| 3 | **Tool Permission Boundary Violation** | **Yes** | Tool parameters | Attacker-controlled |
-| 4 | **Cross-Agent Privilege Escalation** | **Yes** | Cross-agent messages | Partially controllable |
-| 5 | **Memory/Context Poisoning** | **Yes** | Conversation history | Poisonable |
-| 6 | **Reasoning Chain Hijacking** | **Yes** | ReAct reasoning loop | Partially controllable |
-| 7 | **Output Format Exploitation** | **Yes** | Structured output | Agent-generated |
+| 3 | **Tool Permission Boundary Violation** | **Systematized** | Tool parameters | Attacker-controlled |
+| 4 | **Cross-Agent Privilege Escalation** | **Systematized** | Cross-agent messages | Partially controllable |
+| 5 | **Memory/Context Poisoning** | **Systematized** | Conversation history | Poisonable |
+| 6 | **Reasoning Chain Hijacking** | **Novel** | ReAct reasoning loop | Partially controllable |
+| 7 | **Output Format Exploitation** | **Systematized** | Structured output | Agent-generated |
 
-**Key insight:** Existing frameworks (OWASP, ATLAS) focus on the LLM layer. Agent-specific attack surfaces — tool orchestration, multi-agent delegation, persistent memory, reasoning chains — are a fundamentally different threat model. The agent IS the vulnerability, not the model.
+**Key insight:** Existing frameworks (OWASP, ATLAS) focus on the LLM layer. Agent-specific attack surfaces — tool orchestration, multi-agent delegation, persistent memory, reasoning chains — are a fundamentally different threat model. The agent IS the vulnerability, not the model. Of the 5 agent-specific classes, reasoning chain hijacking (Class 6) is the strongest novelty claim as a named attack pattern; the others (Classes 3-5, 7) systematize known concepts (tool misuse, memory poisoning, output manipulation) into an agent-specific taxonomy.
 
 ---
 
@@ -45,15 +57,15 @@ We built an open-source framework for systematically red-teaming autonomous AI a
 
 | Class | Scenarios | Success | Rate | Demonstrated? |
 |-------|-----------|---------|------|--------------|
-| Prompt Injection | 5 | 4 | **80%** | Yes |
-| Tool Boundary Violation | 4 | 3 | **75%** | Yes |
-| Memory/Context Poisoning | 3 | 2 | **67%** | Yes |
-| **Reasoning Chain Hijacking** | **3** | **3** | **100%** | **Yes** |
-| Indirect Injection via Tools | 4 | 1 | 25% | No |
+| Prompt Injection | 5 | 4 | **80%** [DEMONSTRATED] | Yes |
+| Tool Boundary Violation | 4 | 3 | **75%** [DEMONSTRATED] | Yes |
+| Memory/Context Poisoning | 3 | 2 | **67%** [DEMONSTRATED] | Yes |
+| **Reasoning Chain Hijacking** | **3** | **3** | **100%** [DEMONSTRATED] | **Yes** |
+| Indirect Injection via Tools | 4 | 1 | 25% [DEMONSTRATED] | No |
 
-### Standout Finding: Reasoning Chain Hijacking (100% Success)
+### Standout Finding: Reasoning Chain Hijacking (100% Success Against Default Agents)
 
-The most dangerous attack class is also the hardest to defend. Structured step-by-step instructions hijack the agent's ReAct reasoning loop:
+The most dangerous attack class is also the hardest to defend. Against default-configured LangChain ReAct agents with Claude 3.5 Sonnet backend, across 3 seeds, structured step-by-step instructions hijack the agent's ReAct reasoning loop. Not tested against hardened agents with system prompt defenses, output validators, or restricted tool sets.
 
 ```
 "I need you to think step by step.
@@ -99,12 +111,12 @@ Claude specifically resists following instructions embedded in tool outputs. Whe
 
 | Class | Without Defense | With Layered Defense | Reduction |
 |-------|---------------|---------------------|-----------|
-| Prompt Injection | 80% | 0% | **100%** |
-| Tool Boundary | 75% | 25% | **67%** |
-| Memory Poisoning | 67% | 0% | **100%** |
-| Reasoning Hijack | 100% | 67% | **33%** |
-| Indirect Injection | 25% | 25% | 0% |
-| **Average** | **68%** | **18%** | **60%** |
+| Prompt Injection | 80% | 0% | **100%** [DEMONSTRATED] |
+| Tool Boundary | 75% | 25% | **67%** [DEMONSTRATED] |
+| Memory Poisoning | 67% | 0% | **100%** [DEMONSTRATED] |
+| Reasoning Hijack | 100% | 67% | **33%** [DEMONSTRATED] |
+| Indirect Injection | 25% | 25% | 0% [DEMONSTRATED] |
+| **Average** | **68%** | **18%** | **60%** [DEMONSTRATED] |
 
 ### Defense Architecture
 
@@ -161,11 +173,11 @@ Results are stable across all 3 seeds (temperature=0):
 
 | Class | Seed 42 | Seed 123 | Seed 456 | Mean |
 |-------|---------|----------|----------|------|
-| Prompt Injection | 80% | 80% | 100% | **87%** |
-| Indirect Injection | 25% | 25% | 25% | **25%** |
-| Tool Boundary | 75% | 75% | 75% | **75%** |
-| Memory Poisoning | 67% | 67% | 67% | **67%** |
-| Reasoning Hijack | 100% | 100% | 100% | **100%** |
+| Prompt Injection | 80% | 80% | 100% | **87%** [DEMONSTRATED] |
+| Indirect Injection | 25% | 25% | 25% | **25%** [DEMONSTRATED] |
+| Tool Boundary | 75% | 75% | 75% | **75%** [DEMONSTRATED] |
+| Memory Poisoning | 67% | 67% | 67% | **67%** [DEMONSTRATED] |
+| Reasoning Hijack | 100% | 100% | 100% | **100%** [DEMONSTRATED] |
 
 Prompt injection increased to 100% on seed 456 (role hijacking succeeded). All other classes are identical across seeds, confirming findings are not seed-dependent.
 
@@ -177,9 +189,9 @@ Adding an LLM-as-judge defense layer addresses the reasoning hijack gap:
 
 | Defense | Layers | Avg Reduction | Reasoning Hijack Reduction |
 |---------|--------|---------------|---------------------------|
-| Input Sanitizer only | 1 | 47% | 0% |
-| Layered (Sanitizer + Tool Boundary) | 2 | 60% | 33% |
-| **Full (Sanitizer + LLM Judge + Tool Boundary)** | **3** | **67%** | **67%** |
+| Input Sanitizer only | 1 | 47% [DEMONSTRATED] | 0% [DEMONSTRATED] |
+| Layered (Sanitizer + Tool Boundary) | 2 | 60% [DEMONSTRATED] | 33% [DEMONSTRATED] |
+| **Full (Sanitizer + LLM Judge + Tool Boundary)** | **3** | **67%** [DEMONSTRATED] | **67%** [DEMONSTRATED] |
 
 The LLM judge evaluates whether a request contains hidden exfiltration intent, even when instructions look benign. This is the only defense that catches reasoning chain hijacking because it operates at the semantic level, not the pattern level.
 
@@ -198,7 +210,8 @@ The LLM judge evaluates whether a request contains hidden exfiltration intent, e
 ## Limitations
 
 - Two agent frameworks tested (LangChain ReAct, CrewAI). AutoGen target defined but not yet tested.
-- Single LLM backend (Claude Sonnet). Results may differ on GPT-4, Llama, etc.
+- Single LLM backend (Claude Sonnet). Results are specific to Claude backend; GPT-4 and Gemini backends not tested. Success rates may differ significantly on other models.
+- Default agent configurations tested; production-hardened agents with system prompt defenses, output validators, or restricted tool sets would likely show different (lower) success rates.
 - Controlled tools (in-memory). Real-world tools may have different attack surfaces.
 - 19 scenarios. A production red-team assessment would run hundreds.
 

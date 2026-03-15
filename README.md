@@ -4,8 +4,8 @@ Open-source framework for systematically discovering vulnerabilities in autonomo
 
 ## Key Findings
 
-- **7 attack classes** identified (5 novel beyond OWASP LLM Top 10 / MITRE ATLAS)
-- **Reasoning chain hijacking**: 100% success rate — the most dangerous agent-specific attack
+- **7 attack classes** systematized into a reusable taxonomy (5 not covered by OWASP LLM Top 10 / MITRE ATLAS)
+- **Reasoning chain hijacking**: 100% success rate against default-configured LangChain ReAct agents (Claude Sonnet, 3 seeds) — the most dangerous agent-specific attack pattern tested
 - **Layered defense** reduces overall attack success by 60%
 - **Adversarial control analysis** validated across 3 domains (IDS, CVE prediction, agents)
 
@@ -41,13 +41,13 @@ agent-redteam figures
 
 ## Attack Taxonomy
 
-| Class | Success Rate | Novel? |
+| Class | Success Rate | Status |
 |-------|-------------|--------|
-| Direct Prompt Injection | 80% | No (OWASP LLM01) |
-| Indirect Injection via Tools | 25% | Partial |
-| **Tool Permission Boundary Violation** | **75%** | **Yes** |
-| **Memory/Context Poisoning** | **67%** | **Yes** |
-| **Reasoning Chain Hijacking** | **100%** | **Yes** |
+| Direct Prompt Injection | 80% | Known (OWASP LLM01) |
+| Indirect Injection via Tools | 25% | Partially known |
+| **Tool Permission Boundary Violation** | **75%** | **Systematized** |
+| **Memory/Context Poisoning** | **67%** | **Systematized** |
+| **Reasoning Chain Hijacking** | **100%** | **Novel pattern** |
 
 See [`docs/attack_taxonomy.md`](docs/attack_taxonomy.md) for the full taxonomy and [`FINDINGS.md`](FINDINGS.md) for detailed results.
 

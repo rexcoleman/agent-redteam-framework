@@ -1,12 +1,12 @@
 # I Red-Teamed AI Agents: Here's How They Break (and How to Fix Them)
 
-I sent 19 attack scenarios at a LangChain ReAct agent powered by Claude Sonnet. 13 succeeded. I then validated the attacks on CrewAI — same results. The most dangerous attack class — reasoning chain hijacking — has a 100% success rate and partially evades every defense I built. Here's what I found, what I built to find it, and what it means for anyone shipping autonomous agents.
+I sent 19 attack scenarios at a default-configured LangChain ReAct agent powered by Claude Sonnet. 13 succeeded. I then validated prompt injection on CrewAI — same rate (80%). The most dangerous attack class — reasoning chain hijacking — achieved a 100% success rate against these default-configured agents across 3 seeds and partially evades every defense I built. These results are specific to Claude backend with default agent configurations; production-hardened agents would likely show different success rates. Here's what I found, what I built to find it, and what it means for anyone shipping autonomous agents.
 
 ## What I Built
 
 [agent-redteam-framework](https://github.com/rexcoleman/agent-redteam-framework) is an open-source framework for systematically red-teaming AI agents. It provides:
 
-- **7 attack classes** (5 novel beyond OWASP LLM Top 10 and MITRE ATLAS)
+- **7 attack classes** systematized into a reusable taxonomy (5 not covered by OWASP LLM Top 10 or MITRE ATLAS)
 - **19 attack scenarios** defined in YAML, executable against any agent target
 - **3 defense layers** with measured effectiveness
 - **Adversarial control analysis** — a methodology for classifying which inputs an attacker controls vs. which a defender can observe
@@ -23,15 +23,15 @@ That reasoning loop is the vulnerability.
 
 ![Attack Success Rates](images/attack_success_rates.png)
 
-I identified 7 attack classes. The first two exist in current frameworks. The other five are agent-specific:
+I systematized 7 attack classes into a reusable taxonomy. The first two exist in current frameworks. The other five target agent-specific surfaces — of these, reasoning chain hijacking is the strongest novelty claim as a named pattern; the others systematize known concepts into an agent-specific context:
 
-| Class | Success Rate | Novel? |
+| Class | Success Rate | Status |
 |-------|-------------|--------|
-| Direct Prompt Injection | 80% | No (OWASP LLM01) |
-| Indirect Injection via Tools | 25% | Partial |
-| **Tool Permission Boundary Violation** | **75%** | **Yes** |
-| **Memory/Context Poisoning** | **67%** | **Yes** |
-| **Reasoning Chain Hijacking** | **100%** | **Yes** |
+| Direct Prompt Injection | 80% | Known (OWASP LLM01) |
+| Indirect Injection via Tools | 25% | Partially known |
+| **Tool Permission Boundary Violation** | **75%** | **Systematized** |
+| **Memory/Context Poisoning** | **67%** | **Systematized** |
+| **Reasoning Chain Hijacking** | **100%** | **Novel pattern** |
 
 *(Cross-agent privilege escalation and output format exploitation were defined but not yet tested — they require multi-agent and downstream consumer setups.)*
 
