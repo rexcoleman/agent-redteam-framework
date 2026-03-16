@@ -18,6 +18,7 @@ ROOT = Path(__file__).parent.parent
 FIGURES_DIR = ROOT / "outputs" / "figures"
 BLOG_IMAGES_DIR = ROOT / "blog" / "images"
 SCRIPT_PATH = ROOT / "scripts" / "generate_figures.py"
+REPORT_SCRIPT_PATH = ROOT / "scripts" / "make_report_figures.py"
 
 # Expected figures from FINDINGS.md: 3 generated figures + 2 pre-existing
 EXPECTED_GENERATED = {
@@ -26,7 +27,14 @@ EXPECTED_GENERATED = {
     "attack_by_class.png",
 }
 
-EXPECTED_ALL_FIGURES = EXPECTED_GENERATED | {
+EXPECTED_REPORT = {
+    "report_attack_by_class.png",
+    "report_defense_comparison.png",
+    "report_seed_consistency.png",
+    "report_framework_comparison.png",
+}
+
+EXPECTED_ALL_FIGURES = EXPECTED_GENERATED | EXPECTED_REPORT | {
     "controllability_analysis.png",
     "defense_comparison.png",
 }
@@ -59,6 +67,40 @@ class TestFigureGenerationScript:
         source = SCRIPT_PATH.read_text()
         assert "def main()" in source
         assert '__name__ == "__main__"' in source or "__name__ == '__main__'" in source
+
+
+class TestReportFigureScript:
+
+    def test_report_script_exists(self):
+        """scripts/make_report_figures.py exists."""
+        assert REPORT_SCRIPT_PATH.exists(), f"Missing: {REPORT_SCRIPT_PATH}"
+
+    def test_report_script_is_valid_python(self):
+        """Report script compiles as valid Python."""
+        source = REPORT_SCRIPT_PATH.read_text()
+        compile(source, str(REPORT_SCRIPT_PATH), "exec")
+
+    def test_report_script_imports_json(self):
+        """Report script imports json module."""
+        source = REPORT_SCRIPT_PATH.read_text()
+        assert "import json" in source
+
+    def test_report_script_uses_agg_backend(self):
+        """Report script uses Agg backend (no display needed)."""
+        source = REPORT_SCRIPT_PATH.read_text()
+        assert "Agg" in source
+
+    def test_report_script_has_main(self):
+        """Report script has main() and __name__ guard."""
+        source = REPORT_SCRIPT_PATH.read_text()
+        assert "def main()" in source
+        assert '__name__ == "__main__"' in source
+
+    def test_report_figures_exist(self):
+        """All 4 report figures exist."""
+        for name in EXPECTED_REPORT:
+            path = FIGURES_DIR / name
+            assert path.exists(), f"Missing report figure: {path}"
 
 
 class TestExistingFigures:

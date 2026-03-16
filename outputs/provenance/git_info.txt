@@ -1,0 +1,17 @@
+commit: 633d2af02876b7f6d96a1488d5dd590a58a1192e
+branch: main
+date: 2026-03-16 16:20:51 +0000
+author: Rex Coleman <rexcoleman@gmail.com>
+subject: Quality gates: 75 new tests, reproduce.sh
+
+--- git log (last 10) ---
+633d2af Quality gates: 75 new tests, reproduce.sh
+4d29ebf Note figures generated from JSON data in FINDINGS.md
+f7dd2d1 Generate figures from JSON data (was hardcoded)
+da6cde2 CS 7641 rigor: hypotheses, data-driven figures, ablation, 28 tests
+cd735e6 Calibrate novelty claims: systematized not novel, scope 100% finding
+8329058 Professional polish: LICENSE, README, pyproject.toml, tests, environment.yml
+03a4c18 Add MIT license
+1f56989 Stretch goals complete: multi-seed, LLM judge, full defense stack
+1ffc46a FP-02 complete: CrewAI target, CLI, figures, README — all DoD items satisfied
+a3e70c7 FP-02 Phase 5: blog draft, conference abstract, PUBLICATION_PIPELINE filled
