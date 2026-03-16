@@ -229,6 +229,8 @@ The LLM judge evaluates whether a request contains hidden exfiltration intent, e
 | Project brief | `docs/PROJECT_BRIEF.md` |
 | Configuration | `config/base.yaml` |
 
+**Figures:** All figures in `outputs/figures/` are generated from raw JSON data by `scripts/generate_figures.py` (no hardcoded values). 3 figures: attack success rates (per-class with error bars across 3 seeds), defense effectiveness (4 layers compared), and attack-by-class heatmap.
+
 ---
 
 ## Cost
