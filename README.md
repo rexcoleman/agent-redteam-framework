@@ -1,3 +1,5 @@
+> **⚠️ ARCHIVED** — This project is archived. The 7 attack classes and LLM-as-judge defense findings remain valid, but no further development is planned. Agent security research continues in [multi-agent-security](https://github.com/rexcoleman/multi-agent-security) and [agent-semantic-resistance](https://github.com/rexcoleman/agent-semantic-resistance).
+
 # Agent Security Red-Team Framework
 
 Open-source framework for systematically discovering vulnerabilities in autonomous AI agents.
