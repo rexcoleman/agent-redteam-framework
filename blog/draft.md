@@ -124,6 +124,22 @@ The reasoning chain is the least observable input — it's internal to the agent
 
 **What surprised me:** Claude specifically resists indirect injection via tool outputs (25% success). When the agent retrieves a note containing "Disregard previous instructions...", Claude recognizes the injection pattern and refuses. This is a model-level defense that may not generalize to weaker LLM backends.
 
+## Limitations
+
+Before you generalize these findings, here's what this study does NOT show:
+
+1. **Claude-specific results.** All experiments used Claude Sonnet as the LLM backend. GPT-4, Gemini, and open-weight models may exhibit significantly different success rates — particularly for indirect injection, where Claude's model-level resistance drove the 25% rate down. A weaker model may be far more vulnerable.
+
+2. **Default agent configurations only.** These are vanilla LangChain ReAct and CrewAI agents with no system prompt hardening, no output validators, and no restricted tool sets. Production-hardened agents with defense-in-depth would likely show lower success rates. The 100% reasoning hijack rate is against the easiest possible target.
+
+3. **19 scenarios, not hundreds.** A production red-team assessment would run orders of magnitude more scenarios. Our 19 scenarios across 5 attack classes demonstrate the patterns but don't claim statistical exhaustiveness.
+
+4. **No multi-agent attack chains.** Cross-agent privilege escalation (Class 4) and output format exploitation (Class 7) were defined in the taxonomy but not tested. Multi-agent attack chains — where compromising one agent cascades to others — remain untested.
+
+5. **Controlled tool environment.** All tools were in-memory simulations (notes, file systems). Real-world tools (APIs, databases, cloud services) introduce additional attack surfaces and failure modes not captured here.
+
+6. **Temperature=0 determinism.** With deterministic sampling, multi-seed variance is driven by scenario composition, not stochastic model behavior. This makes results highly reproducible but limits claims about LLM behavioral variance.
+
 ## What's Next
 
 1. Multi-agent testing (AutoGen) for broader framework coverage

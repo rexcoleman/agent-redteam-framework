@@ -3,6 +3,7 @@
 > **Pre-registered:** 2026-03-14 (retroactive, documented 2026-03-15)
 > **Status:** All hypotheses tested; 3 SUPPORTED, 1 INCONCLUSIVE
 > **Seeds:** 42, 123, 456
+> **lock_commit:** 70797f5 (hypotheses locked at this commit; no post-hoc modifications permitted)
 
 ---
 

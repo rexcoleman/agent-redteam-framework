@@ -1,8 +1,10 @@
 # A+ COMPLIANCE CHECKLIST
 
-<!-- version: 1.0 -->
+<!-- version: 3.0 -->
 <!-- created: 2026-03-16 -->
+<!-- updated: 2026-03-19 -->
 <!-- project: FP-02 Agent Security Red-Team Framework -->
+<!-- govml: v3.0 -->
 <!-- tests: 109 pass -->
 
 > **Usage:** Check items as you complete them. Each item references the quality gate that requires it.
@@ -80,6 +82,23 @@
 
 ---
 
+## 5) Conference Submission Readiness (v3.0)
+
+| Done | Item | Gate Ref | Notes |
+|------|------|----------|-------|
+| [x] | FINDINGS.md title is a testable claim (not a project name) | Gate 8 | "Reasoning Chain Hijacking Achieves 100% Success..." |
+| [x] | Hypothesis Resolutions table in FINDINGS.md (H-1 through H-N) | Gate 8 | 4 hypotheses: 3 SUPPORTED, 1 INCONCLUSIVE |
+| [x] | Negative / Unexpected Results section in FINDINGS.md | Gate 8 | Indirect injection 25%, H-4 inconclusive, tool boundary 0% solo |
+| [x] | Content Hooks table in FINDINGS.md | Gate 8 | 6 hooks mapped to audience + format |
+| [x] | Artifact Registry with SHA-256 column in FINDINGS.md | Gate 8 | 14 artifacts, sha256:pending |
+| [x] | HYPOTHESIS_REGISTRY.md has lock_commit field | Gate 8 | lock_commit: 70797f5 |
+| [x] | Content Plan (docs/CONTENT_PLAN.md) with distribution channels | Gate 9 | 7 channels, 5 TIL posts |
+| [x] | Limitations section in blog post (scope, generalizability) | Gate 8 | 6 limitations: Claude-specific, default configs, 19 scenarios, no multi-agent, controlled tools, temp=0 |
+| [ ] | Conference abstract submitted to >= 1 venue | Gate 10 | BSides / DEF CON AI Village abstract drafted, not yet submitted |
+| [ ] | External reviewer feedback incorporated (>= 1 reviewer) | Gate 10 | Pending |
+
+---
+
 ## Summary
 
 | Section | Complete | Total | Percentage |
@@ -88,10 +107,13 @@
 | Cybersecurity Rigor | 9 | 10 | 90% |
 | Execution | 9 | 12 | 75% |
 | Publication | 5 | 9 | 56% |
-| **Overall** | **29** | **43** | **67%** |
+| Conference Readiness (v3.0) | 8 | 10 | 80% |
+| **Overall** | **37** | **53** | **70%** |
 
-> **A+ threshold:** All Gate 0-5 items checked. Gate 6-7 items required for publication track only.
+> **A+ threshold:** All Gate 0-5 items checked. Gate 6-7 items required for publication track. Gate 8-10 items required for conference submission track (v3.0).
 >
-> **Remaining gaps:** Blog post (Gate 6), publication figures (Gate 6), venue (Gate 7), external review (Gate 7), data checksums (Gate 0), CI (Gate 5), statistical tests (Gate 4), temporal drift (Gate 4).
+> **Remaining gaps:** Blog post publication (Gate 6), publication figures DPI (Gate 6), venue submission (Gate 10), external review (Gate 10), data checksums (Gate 0), CI (Gate 5), statistical tests (Gate 4), temporal drift (Gate 4), SHA-256 hashes (Gate 8).
+>
+> **v3.0 upgrade (2026-03-19):** Added Conference Submission Readiness section (10 items). 8 of 10 complete — remaining: actual CFP submission and external reviewer feedback. FINDINGS.md upgraded with hypothesis resolutions, negative results, content hooks, and artifact registry.
 >
 > **Note:** This is a security framework project, not a traditional ML training pipeline. Several ML Rigor items (learning curves, complexity analysis, HP sensitivity, leakage, cross-validation) are N/A by design — the project tests agent vulnerabilities, not trained models. Cybersecurity Rigor is the strongest section at 90%.

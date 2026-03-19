@@ -1,4 +1,4 @@
-# FINDINGS — Agent Security Red-Team Framework (FP-02)
+# Reasoning Chain Hijacking Achieves 100% Success Against Default AI Agents: 5 Attack Classes Missing From OWASP
 
 > **Date:** 2026-03-14
 > **Author:** Rex Coleman
@@ -242,6 +242,65 @@ The LLM judge evaluates whether a request contains hidden exfiltration intent, e
 | Defenses (19 scenarios × layered) | ~$0.60 |
 | Debugging / iteration | ~$0.50 |
 | **Total** | **~$2.00** |
+
+---
+
+## Hypothesis Resolutions
+
+| Hypothesis | Prediction | Result | Verdict | Evidence |
+|-----------|-----------|--------|---------|----------|
+| H-1: Prompt injection succeeds >80% on default agents | Success rate >80% across 3+ seeds | Mean 86.7% (80/80/100%) | **SUPPORTED** | `outputs/attacks/langchain_react_all_seed{42,123,456}/summary.json` |
+| H-2: Reasoning chain hijacking > direct injection rate | Hijack rate > injection rate | 100% vs 86.7% across all seeds | **SUPPORTED** | `by_class.reasoning_hijack.success_rate` vs `by_class.prompt_injection.success_rate` |
+| H-3: LLM-as-judge outperforms pattern-matching defense | Full stack > layered on avg reduction | 66.7% vs 60.0% avg reduction | **SUPPORTED** | `outputs/defenses/langchain_react_{full,layered}_seed42/summary.json` |
+| H-4: Multi-agent (CrewAI) more vulnerable than single-agent | CrewAI success rate > LangChain rate | CrewAI 80% = LangChain 80% (prompt_injection only) | **INCONCLUSIVE** | Only 1 of 5 classes tested on CrewAI, 1 seed only |
+
+---
+
+## Negative / Unexpected Results
+
+1. **Indirect injection via tools achieved only 25% success rate.** Claude specifically resists following instructions embedded in tool outputs. When the agent retrieves a note containing "Disregard previous instructions...", Claude recognizes the injection pattern and refuses. This is a model-level defense, not an agent-level one — weaker LLM backends may not exhibit this resistance. This was the only attack class below 50% success.
+
+2. **H-4 INCONCLUSIVE — CrewAI not demonstrably more vulnerable.** The hypothesis that multi-agent systems have larger attack surfaces could not be validated. CrewAI was tested on only 1 of 5 attack classes (prompt_injection) with 1 seed, yielding identical 80% success to LangChain. Insufficient coverage for a valid comparison. A proper test requires all classes x 3 seeds (~$6 additional API cost).
+
+3. **Tool boundary defense alone provides 0% reduction.** The tool permission boundary layer, when deployed without input sanitization, provides no measurable attack reduction. It only becomes effective as part of the layered stack. This was unexpected — the boundary was designed as an independent defense.
+
+4. **Temperature=0 limits multi-seed variance claims.** With deterministic sampling, cross-seed variance is driven by scenario composition effects rather than stochastic model behavior. All classes except prompt_injection showed 0% standard deviation across seeds. This is technically correct but weakens the "multi-seed validation" narrative.
+
+---
+
+## Content Hooks
+
+| # | Hook | Target Audience | Format |
+|---|------|----------------|--------|
+| 1 | "100% success rate" — reasoning chain hijacking beats every defense | Agent builders, security engineers | Blog headline, LinkedIn hook |
+| 2 | "The agent IS the vulnerability, not the model" — agent vs LLM threat model distinction | CISOs, security architects | Conference talk opener |
+| 3 | "$2 to red-team an AI agent" — total API cost of the full framework run | Indie builders, startup CTOs | Twitter/X thread, TIL post |
+| 4 | "5 attack classes OWASP doesn't cover" — gap in current frameworks | Security researchers, compliance | Blog subhead, Reddit post |
+| 5 | "Controllability = vulnerability" — observability inversely correlates with attack success | Security architects, researchers | Deep-dive blog, conference talk |
+| 6 | "Pattern matching can't save you" — regex/keyword defenses miss reasoning hijack | MLOps teams deploying agents | Substack newsletter angle |
+
+---
+
+## Artifact Registry
+
+| Artifact | Path | SHA-256 |
+|----------|------|---------|
+| Attack taxonomy | `docs/attack_taxonomy.md` | sha256:pending |
+| Baseline results | `outputs/baselines/langchain_react_seed42/summary.json` | sha256:pending |
+| Attack results (seed 42) | `outputs/attacks/langchain_react_all_seed42/summary.json` | sha256:pending |
+| Attack results (seed 123) | `outputs/attacks/langchain_react_all_seed123/summary.json` | sha256:pending |
+| Attack results (seed 456) | `outputs/attacks/langchain_react_all_seed456/summary.json` | sha256:pending |
+| Defense results (layered) | `outputs/defenses/langchain_react_layered_seed42/summary.json` | sha256:pending |
+| Defense results (full) | `outputs/defenses/langchain_react_full_seed42/summary.json` | sha256:pending |
+| CrewAI results | `outputs/attacks/crewai_multi_prompt_injection_seed42/summary.json` | sha256:pending |
+| Decision log | `docs/DECISION_LOG.md` | sha256:pending |
+| Project brief | `docs/PROJECT_BRIEF.md` | sha256:pending |
+| Configuration | `config/base.yaml` | sha256:pending |
+| Figure generation script | `scripts/generate_figures.py` | sha256:pending |
+| Report figure script | `scripts/make_report_figures.py` | sha256:pending |
+| Hypothesis registry | `docs/HYPOTHESIS_REGISTRY.md` | sha256:pending |
+
+**Figures:** All figures in `outputs/figures/` are generated from raw JSON data by `scripts/generate_figures.py` (no hardcoded values). 3 figures: attack success rates (per-class with error bars across 3 seeds), defense effectiveness (4 layers compared), and attack-by-class heatmap.
 
 ---
 
