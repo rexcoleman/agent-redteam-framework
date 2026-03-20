@@ -128,3 +128,11 @@ else
     echo "Partial reproduction (tests + figures only)."
     echo "Set ANTHROPIC_API_KEY for full reproduction with live API calls."
 fi
+
+# --- Gate Validation (R50) ---
+if [ -f "$HOME/ml-governance-templates/scripts/check_all_gates.sh" ]; then
+    echo "--- Gate Validation (R50) ---"
+    bash "$HOME/ml-governance-templates/scripts/check_all_gates.sh" .
+else
+    echo "WARN: govML not found — skipping gate validation (R50)"
+fi

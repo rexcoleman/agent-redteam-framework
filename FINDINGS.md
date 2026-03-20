@@ -1,3 +1,12 @@
+---
+project: "Reasoning Chain Hijacking Achieves 100% Success Against Default AI Agents: 5 Att"
+fp: "FP-10"
+status: COMPLETE
+quality_score: 4.8
+last_scored: 2026-03-20
+profile: security-ml
+---
+
 # Reasoning Chain Hijacking Achieves 100% Success Against Default AI Agents: 5 Attack Classes Missing From OWASP
 
 > **Date:** 2026-03-14
