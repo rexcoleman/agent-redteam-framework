@@ -2,7 +2,9 @@
 
 # Agent Security Red-Team Framework
 
-Open-source framework for systematically discovering vulnerabilities in autonomous AI agents.
+Reasoning chain hijacking hits 100% success against default LangChain ReAct agents. 7 attack classes systematized — 5 absent from OWASP LLM Top 10 and MITRE ATLAS. Layered defense reduces overall success by 60%.
+
+**Blog post:** [I Red-Teamed AI Agents: Here's How They Break](https://rexcoleman.dev/posts/agent-redteam/)
 
 ## Key Findings
 
