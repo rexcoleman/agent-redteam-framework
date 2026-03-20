@@ -1,4 +1,4 @@
-# blog/ — Content Artifacts for FP-02
+# blog/ — Content Artifacts for Agent Red-Team Framework
 
 This directory contains all content artifacts derived from the Agent Security Red-Team Framework research.
 
