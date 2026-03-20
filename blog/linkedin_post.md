@@ -24,9 +24,9 @@ I built an open-source red-team framework to systematically test this. Key findi
 - The reasoning chain is internal state — defenders can't see it, and that's why it's the most vulnerable surface
 - Total cost: ~$2 in API tokens
 
-The deeper insight is architectural: if you're deploying agents in production, you need to classify every input by controllability BEFORE designing defenses. Pattern matching won't save you when the attack looks like a legitimate task.
+The architectural implication: if you're deploying agents in production, classify every input by controllability BEFORE designing defenses. Pattern matching won't save you when the attack looks like a legitimate task.
 
-Framework is open source. Details in the comments.
+Framework is open source. What's the hardest attack class you've encountered in your agent deployments?
 
 ---
 

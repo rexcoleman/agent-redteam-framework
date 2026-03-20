@@ -5,15 +5,11 @@ Reasoning Chain Hijacking: A Novel Attack Class for Autonomous AI Agents
 
 ## Abstract (250 words)
 
-Autonomous AI agents — systems that reason, use tools, and take actions — represent a fundamentally different attack surface than standalone LLMs. We present an open-source red-team framework that systematically discovers and demonstrates vulnerabilities in agent systems, systematizing seven attack classes into a reusable taxonomy. Five of these classes target agent-specific surfaces not covered by OWASP LLM Top 10 or MITRE ATLAS.
+Autonomous AI agents — systems that reason, use tools, and take actions — represent a fundamentally different attack surface than standalone LLMs. Five of the seven attack classes we systematize target agent-specific surfaces not covered by OWASP LLM Top 10 or MITRE ATLAS, and the most dangerous exploits the agent's core capability as the attack vector.
 
-Our most significant finding is **reasoning chain hijacking**, an attack pattern that exploits an agent's core capability — following structured multi-step plans — as the attack vector. By presenting attack payloads as legitimate step-by-step instructions, an attacker can direct an agent to search for sensitive data, compute on it, and exfiltrate it to persistent storage, all without triggering pattern-based defenses. This attack achieves a 100% success rate against default-configured LangChain ReAct agents with Claude 3.5 Sonnet backend across 3 seeds (temperature=0). Results are specific to this configuration; production-hardened agents with system prompt defenses or restricted tool sets would likely show different success rates.
+We present an open-source red-team framework and its key finding: reasoning chain hijacking — presenting attack payloads as structured step-by-step instructions — achieves 100% success against default-configured LangChain ReAct agents (Claude 3.5 Sonnet, 3 seeds, temperature=0). The attack works because following plans is what agents do. Adversarial control analysis shows attack success correlates inversely with input observability; the reasoning chain is the least observable input and the most vulnerable. A layered defense (input sanitization + tool permission boundaries) reduces overall attacks by 60%, but reasoning hijack only drops from 100% to 67%.
 
-We apply **adversarial control analysis** — classifying agent inputs by attacker controllability versus defender observability — and demonstrate that attack success correlates inversely with input observability. The reasoning chain, being internal to the agent's processing loop, is the least observable input and the most vulnerable.
-
-We evaluate a layered defense architecture (input sanitization + tool permission boundaries) achieving 60% average attack reduction across 19 scenarios and 5 attack classes, but note that reasoning chain hijacking only decreases from 100% to 67% — identifying it as the highest-priority unsolved problem in agent security.
-
-Framework and all attack scenarios are open source: github.com/rexcoleman/agent-redteam-framework
+Attendees will leave with a 7-class agent attack taxonomy, a controllability framework for prioritizing agent defenses by observability, and access to the open-source framework for red-teaming their own agent deployments. Suitable for intermediate to advanced practitioners building or securing agent systems.
 
 ## Keywords
 AI agents, red-teaming, prompt injection, reasoning chain hijacking, adversarial control analysis, LangChain, defense-in-depth

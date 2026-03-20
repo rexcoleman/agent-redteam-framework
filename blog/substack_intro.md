@@ -20,11 +20,7 @@ Why? Because the attack looks exactly like a legitimate multi-step task. No inje
 
 I built a layered defense (input sanitizer + tool permission boundary) that reduces overall attacks by 60%. But reasoning hijack only drops from 100% to 67%. The only thing that catches it is a semantic defense — an LLM-as-judge that evaluates intent before execution.
 
-The full technical write-up covers:
-- The 7-class attack taxonomy (5 classes missing from OWASP)
-- Defense architecture and measured effectiveness
-- The controllability insight (why observability predicts vulnerability)
-- What I'd do differently next time
+The full technical write-up covers the 7-class attack taxonomy (5 classes missing from OWASP), defense architecture with measured effectiveness, and the controllability insight that predicts which inputs are most vulnerable.
 
 Read the full post here: [link to rexcoleman.dev]
 
@@ -34,6 +30,3 @@ If you're deploying agents in production, I'd genuinely like to hear what attack
 
 — Rex
 
----
-
-*Rex Coleman builds at the intersection of AI security and ML systems engineering. MSCS (Machine Learning) at Georgia Tech. Creator of govML.*
